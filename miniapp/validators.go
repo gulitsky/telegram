@@ -1,13 +1,19 @@
 package miniapp
 
 import (
+	"errors"
 	"regexp"
-
-	"github.com/go-playground/validator/v10"
 )
 
 var shortNameRe = regexp.MustCompile(`^\w{3,30}$`)
 
-func ValidateShortName(fl validator.FieldLevel) bool {
-	return shortNameRe.MatchString(fl.Field().String())
+func ValidateShortName(value any) error {
+	s, ok := value.(string)
+	if !ok {
+		return errors.New("must be a string")
+	}
+	if !shortNameRe.MatchString(s) {
+		return errors.New("invalid short name format")
+	}
+	return nil
 }

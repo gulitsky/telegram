@@ -1,10 +1,9 @@
 package telegram
 
 import (
+	"errors"
 	"regexp"
 	"slices"
-
-	"github.com/go-playground/validator/v10"
 )
 
 var (
@@ -38,18 +37,48 @@ var (
 	usernameRe = regexp.MustCompile(`^\w{4,32}$`)
 )
 
-func ValidateBotToken(fl validator.FieldLevel) bool {
-	return botTokenRe.MatchString(fl.Field().String())
+func ValidateBotToken(value any) error {
+	s, ok := value.(string)
+	if !ok {
+		return errors.New("must be a string")
+	}
+
+	if !botTokenRe.MatchString(s) {
+		return errors.New("invalid secret token format")
+	}
+
+	return nil
 }
 
-func ValidateBotWebhookSecretToken(fl validator.FieldLevel) bool {
-	return secretTokenRe.MatchString(fl.Field().String())
+func ValidateBotWebhookSecretToken(value any) error {
+	s, ok := value.(string)
+	if !ok {
+		return errors.New("must be a string")
+	}
+	if !secretTokenRe.MatchString(s) {
+		return errors.New("invalid secret token format")
+	}
+	return nil
 }
 
-func ValidateBotUpdateType(fl validator.FieldLevel) bool {
-	return slices.Contains(updateTypes, fl.Field().String())
+func ValidateBotUpdateType(value any) error {
+	s, ok := value.(string)
+	if !ok {
+		return errors.New("must be a string")
+	}
+	if !slices.Contains(updateTypes, s) {
+		return errors.New("invalid update type")
+	}
+	return nil
 }
 
-func ValidateUsername(fl validator.FieldLevel) bool {
-	return usernameRe.MatchString(fl.Field().String())
+func ValidateUsername(value any) error {
+	s, ok := value.(string)
+	if !ok {
+		return errors.New("must be a string")
+	}
+	if !usernameRe.MatchString(s) {
+		return errors.New("invalid username format")
+	}
+	return nil
 }
